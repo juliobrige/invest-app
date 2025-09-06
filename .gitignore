@@ -1,0 +1,44 @@
+Ficheiro .gitignore para um projeto Django + React
+Ambientes Virtuais
+venv/
+env/
+.env*
+!.env.example
+
+Ficheiros Temporários do Python
+*.pyc
+pycache/
+.pytest_cache/
+.coverage
+
+Base de Dados Local
+Ignorar a base de dados SQLite usada em desenvolvimento
+db.sqlite3
+*.sqlite3
+
+Ficheiros de Média e Estáticos (Uploads e Compilados)
+Os uploads dos utilizadores não devem ir para o Git
+media/
+
+Ficheiros estáticos compilados (geridos por processos de build)
+static_root/
+staticfiles/
+
+Ficheiros de IDEs e Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+Ficheiros do Frontend (Node.js/React)
+Ignorar a pasta com milhões de dependências
+frontend/node_modules/
+
+Ficheiros de build do frontend
+frontend/build/
+frontend/dist/
+
+Logs e ficheiros temporários do npm/yarn
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
