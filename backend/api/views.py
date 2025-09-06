@@ -7,9 +7,6 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.db import transaction as db_transaction
 from django.utils import timezone
-
-# --- Imports dos Modelos ---
-# os modelos da app 'api' e da app 'users'
 from users.models import CustomUser
 from .models import Profile, Wallet, Transaction, BankAccount, MachinePlan, Investment
 
@@ -27,8 +24,6 @@ from .serializers import (
     WithdrawalCreateSerializer
 )
 
-
-# --- Views de Autenticação e Perfil ---
 
 class MyTokenObtainPairView(TokenObtainPairView):
     """View de login personalizada para usar o serializer que funciona com número de telefone."""
@@ -59,7 +54,6 @@ class AcceptTermsView(APIView):
             profile.accepted_terms = True
             profile.save()
         return Response({"message": "Termos aceites com sucesso."}, status=status.HTTP_200_OK)
-# --- Views Principais da Aplicação ---
 class DashboardView(APIView):
     """Endpoint que agrega todos os dados necessários para o dashboard principal."""
     permission_classes = (IsAuthenticated,)
@@ -132,7 +126,6 @@ class InvestView(generics.CreateAPIView):
         plan_id = serializer.validated_data['plan_id']
         amount = serializer.validated_data['amount']
         user = request.user
-        
         try:
             plan = MachinePlan.objects.get(id=plan_id, is_active=True, expiration_date__gte=timezone.now().date())
         except MachinePlan.DoesNotExist:
