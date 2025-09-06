@@ -9,7 +9,7 @@ from django.db import transaction as db_transaction
 from django.utils import timezone
 
 # --- Imports dos Modelos ---
-# Importar os modelos da app 'api' e da app 'users'
+# os modelos da app 'api' e da app 'users'
 from users.models import CustomUser
 from .models import Profile, Wallet, Transaction, BankAccount, MachinePlan, Investment
 
@@ -59,10 +59,7 @@ class AcceptTermsView(APIView):
             profile.accepted_terms = True
             profile.save()
         return Response({"message": "Termos aceites com sucesso."}, status=status.HTTP_200_OK)
-
-
 # --- Views Principais da Aplicação ---
-
 class DashboardView(APIView):
     """Endpoint que agrega todos os dados necessários para o dashboard principal."""
     permission_classes = (IsAuthenticated,)
@@ -108,8 +105,6 @@ class BankAccountListView(generics.ListAPIView):
     queryset = BankAccount.objects.filter(is_active=True)
     serializer_class = BankAccountSerializer
     permission_classes = (IsAuthenticated,)
-
-# --- Views para as Novas Funcionalidades de Investimento e Saque ---
 
 class MachinePlanListView(generics.ListAPIView):
     """Endpoint para listar todas as máquinas de investimento ativas e não expiradas."""

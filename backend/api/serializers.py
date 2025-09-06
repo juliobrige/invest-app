@@ -5,8 +5,6 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from .models import Profile, Wallet, MachinePlan, Investment, Transaction, BankAccount, VIPLevel, timezone
 
-# --- Serializers de Autenticação e Utilizador (ATUALIZADOS) ---
-
 class MachinePlanSerializer(serializers.ModelSerializer):
     """Serializer para listar as máquinas de investimento disponíveis."""
     time_left_seconds = serializers.SerializerMethodField()
@@ -24,7 +22,6 @@ class MachinePlanSerializer(serializers.ModelSerializer):
         if obj.is_expired:
             return 0
         now = timezone.now()
-        # A data de expiração é à meia-noite, então calculamos até ao final desse dia.
         expiration_datetime = timezone.make_aware(
             timezone.datetime.combine(obj.expiration_date, timezone.datetime.max.time())
         )
@@ -34,7 +31,6 @@ class MachinePlanSerializer(serializers.ModelSerializer):
 class InvestmentSerializer(serializers.ModelSerializer):
     """Serializer para exibir os detalhes de um investimento do utilizador."""
     plan = MachinePlanSerializer(read_only=True)
-    # Expomos as propriedades calculadas do modelo como campos de apenas leitura
     current_value = serializers.ReadOnlyField()
     total_return = serializers.ReadOnlyField()
     days_passed = serializers.ReadOnlyField()
@@ -64,7 +60,6 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        # Adicionar dados extra ao token, como o nome do utilizador
         token['name'] = user.name
         return token
 
@@ -88,7 +83,6 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         referral_code = validated_data.pop('referral_code', None)
         
-        # Usamos o nosso CustomUserManager para criar o utilizador
         user = CustomUser.objects.create_user(
             phone_number=validated_data['phone_number'],
             name=validated_data['name'],
@@ -99,11 +93,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         if referral_code:
             try:
                 referrer_profile = Profile.objects.get(referral_code=referral_code)
-                # O sinal 'post_save' já cria o perfil, aqui apenas o atualizamos
                 user.profile.referred_by = referrer_profile.user
                 user.profile.save()
             except Profile.DoesNotExist:
-                # Se o código for inválido, o registo continua normalmente
                 pass
         
         return user
@@ -114,13 +106,9 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ('id', 'phone_number', 'name')
 
-
 # --- Serializers da Aplicação (Atualizados para usar o novo UserSerializer) ---
-
 class ProfileSerializer(serializers.ModelSerializer):
-    # O campo 'user' agora usa o nosso novo UserSerializer para mostrar os dados corretos
     user = UserSerializer(read_only=True)
-    # O StringRelatedField é uma forma limpa de mostrar o nome do nível VIP
     vip_level = serializers.StringRelatedField() 
 
     class Meta:

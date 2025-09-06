@@ -5,8 +5,6 @@ from django.conf import settings
 from django.utils import timezone
 import os
 
-# --- Modelos de Configuração (sem grandes alterações) ---
-
 class VIPLevel(models.Model):
     level_number = models.PositiveSmallIntegerField(primary_key=True, verbose_name="Número do Nível")
     name = models.CharField(max_length=50, verbose_name="Nome do Nível")
@@ -22,13 +20,10 @@ class VIPLevel(models.Model):
         verbose_name = "Nível VIP"
         verbose_name_plural = "Níveis VIP"
 
-# --- Modelos Principais (Com as Novas Funcionalidades) ---
-
-# ALTERADO: O modelo MachinePlan foi significativamente refatorado.
 class MachinePlan(models.Model):
     name = models.CharField(max_length=100, verbose_name="Nome da Máquina")
     image = models.ImageField(
-        upload_to='machine_images/', # As imagens serão guardadas na pasta 'media/machine_images/'
+        upload_to='machine_images/',
         null=True,
         blank=True, # A imagem é opcional
         verbose_name="Imagem da Máquina"
@@ -53,7 +48,6 @@ class MachinePlan(models.Model):
         verbose_name_plural = "Máquinas de Investimento"
 
 class Profile(models.Model):
-    # ... (sem alterações)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     accepted_terms = models.BooleanField(default=False)
     referral_code = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -62,14 +56,12 @@ class Profile(models.Model):
     def __str__(self): return self.user.name
 
 class Wallet(models.Model):
-    # ... (sem alterações)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     available_balance = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     invested_balance = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     total_earnings = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     def __str__(self): return f"Carteira de {self.user.name}"
 
-# ALTERADO: O modelo Investment agora calcula o valor atual dinamicamente.
 class Investment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='investments')
     plan = models.ForeignKey(MachinePlan, on_delete=models.PROTECT, verbose_name="Máquina Investida")
@@ -119,8 +111,6 @@ class Investment(models.Model):
 
     def __str__(self):
         return f"Investimento de {self.user.name} em {self.plan.name}"
-
-# ALTERADO: O modelo Transaction agora tem mais tipos e status para saques.
 class Transaction(models.Model):
     TRANSACTION_CHOICES = (
         ('DEPOSIT', 'Depósito'),
@@ -141,7 +131,6 @@ class Transaction(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     timestamp = models.DateTimeField(auto_now_add=True)
     
-    # Campos que podem não se aplicar a todas as transações
     reference_id = models.CharField(max_length=100, blank=True, null=True)
     proof_of_payment = models.ImageField(upload_to='proof_payments/', blank=True, null=True)
     destination_bank = models.ForeignKey('BankAccount', on_delete=models.SET_NULL, null=True, blank=True)
@@ -152,7 +141,6 @@ class Transaction(models.Model):
         return f"{self.get_transaction_type_display()} de {self.amount} por {self.user.name} - {self.status}"
 
 class BankAccount(models.Model):
-    # ... (sem alterações)
     bank_name = models.CharField(max_length=100, verbose_name="Nome do Banco")
     account_holder = models.CharField(max_length=150, verbose_name="Titular da Conta")
     account_number = models.CharField(max_length=50, blank=True, null=True)

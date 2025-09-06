@@ -38,8 +38,6 @@ class TransactionAdmin(admin.ModelAdmin):
 
     def approve_transactions(self, request, queryset):
         """Ação para aprovar depósitos ou saques."""
-        # A lógica real de creditar/debitar deve estar nos models/signals/services
-        # para garantir consistência. Esta ação apenas atualiza o estado.
         queryset.filter(status__in=['PENDING', 'PROCESSING']).update(status='APPROVED')
     approve_transactions.short_description = "Aprovar transações selecionadas (Depósitos/Saques)"
     
@@ -48,8 +46,6 @@ class TransactionAdmin(admin.ModelAdmin):
         queryset.update(status='REJECTED')
     reject_transactions.short_description = "Rejeitar transações selecionadas"
 
-# --- Outros modelos ---
-
 @admin.register(BankAccount)
 class BankAccountAdmin(admin.ModelAdmin):
     list_display = ('bank_name', 'account_holder', 'iban', 'is_active')
@@ -57,11 +53,9 @@ class BankAccountAdmin(admin.ModelAdmin):
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'accepted_terms', 'vip_level')
-    # CORRIGIDO: Procuramos por 'user__name'
     search_fields = ('user__name',)
 
 @admin.register(Wallet)
 class WalletAdmin(admin.ModelAdmin):
     list_display = ('user', 'available_balance', 'invested_balance', 'total_earnings')
-    # CORRIGIDO: Procuramos por 'user__name'
     search_fields = ('user__name',)
