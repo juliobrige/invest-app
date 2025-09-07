@@ -1,14 +1,26 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.exceptions import ValidationError
-
+import re 
 
 def validate_angolan_phone_number(value):
-    """Valida se o número de telefone começa com o prefixo de Angola."""
-    if not value.startswith('+244'):
-        raise ValidationError('O número de telefone deve começar com o prefixo de Angola (+244).')
-    if len(value) != 13 or not value[1:].isdigit():
-        raise ValidationError('O número de telefone deve ter 13 dígitos e conter apenas números após o "+".')
+    """
+    Valida se o número de telefone segue o formato angolano (+244 seguido de 9 dígitos).
+    Permite números com ou sem espaços.
+    """
+    # Remove espaços em branco para facilitar a validação
+    cleaned_value = re.sub(r'\s+', '', value)
+
+    # Verifica se o formato geral corresponde a +244 seguido por 9 dígitos numéricos
+    if not re.match(r'^\+244\d{9}$', cleaned_value):
+        raise ValidationError(
+            'Número de telefone inválido. O formato deve ser +244 seguido de 9 dígitos (ex: +244912345678).'
+        )
+    
+    # O modelo CharField irá guardar o valor com 13 caracteres
+    if len(cleaned_value) != 13:
+        raise ValidationError('O número de telefone deve conter 13 caracteres no total (+244xxxxxxxxx).')
+
 
 
 class CustomUserManager(BaseUserManager):

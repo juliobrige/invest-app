@@ -24,7 +24,6 @@ from .serializers import (
     WithdrawalCreateSerializer
 )
 
-
 class MyTokenObtainPairView(TokenObtainPairView):
     """View de login personalizada para usar o serializer que funciona com número de telefone."""
     serializer_class = MyTokenObtainPairSerializer
