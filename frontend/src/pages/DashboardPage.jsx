@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import React, { useEffect, useState } from 'react';
 import apiClient from '../api/apiClient';
+import { useAuth } from '../contexts/AuthContext';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 // Importar os nossos componentes premium
 import DashboardHeader from '../components/DashboardHeader';
@@ -9,58 +10,53 @@ import QuickActions from '../components/QuickActions';
 import ActiveInvestments from '../components/ActiveInvestments';
 import BottomNav from '../components/BottomNav';
 
-const Spinner = () => <div className="border-gray-300 h-16 w-16 animate-spin rounded-full border-4 border-t-emerald-600" />;
-
 const DashboardPage = () => {
-  const { logout } = useAuth(); // Apenas para o useEffect
-  const [dashboardData, setDashboardData] = useState(null);
+  // Obtemos os dados e a função para os atualizar do nosso contexto
+  const { wallet, fetchInitialData } = useAuth();
   const [investments, setInvestments] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAllData = async () => {
-      try {
-        const [dashboardRes, investmentsRes] = await Promise.all([
-          apiClient.get('/dashboard/'),
-          apiClient.get('/investments/')
-        ]);
-        setDashboardData(dashboardRes.data);
-        setInvestments(investmentsRes.data);
-      } catch (error) {
-        console.error("Não foi possível carregar os dados", error);
-        if (error.response?.status === 401) {
-          logout();
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAllData();
-  }, [logout]);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <Spinner />
-      </div>
-    );
-  }
   
+  // Lógica para mostrar a mensagem de sucesso (vinda de outras páginas)
+  const location = useLocation();
+  const navigate = useNavigate();
+  const successMessage = location.state?.message;
+
+  // Limpa a mensagem da localização após a mostrar para não reaparecer
+  useEffect(() => {
+      if (successMessage) {
+          navigate(location.pathname, { replace: true, state: {} });
+      }
+  }, [successMessage, navigate, location.pathname]);
+
+  // Efeito para ir buscar os dados dos investimentos
+  useEffect(() => {
+    const fetchInvestments = () => {
+        apiClient.get('/investments/').then(res => {
+            setInvestments(res.data);
+        }).catch(err => {
+            console.error("Não foi possível carregar os investimentos.", err);
+        });
+    };
+    
+    // Vamos buscar os dados quando a página carrega
+    fetchInitialData();
+    fetchInvestments();
+  }, [fetchInitialData]);
+
   return (
     <div className="bg-gray-50 min-h-screen font-sans pb-24">
       <div className="container mx-auto max-w-md">
         
-        {/* O novo cabeçalho já inclui o botão de sair */}
         <DashboardHeader />
+        
+        {successMessage && (
+            <div className="mx-4 mb-4 p-4 text-sm text-green-700 bg-green-100 rounded-lg shadow-sm">
+                {successMessage}
+            </div>
+        )}
 
-        {/* O resto dos componentes continua igual */}
-        <BalanceCard wallet={dashboardData?.wallet} />
+        <BalanceCard wallet={wallet} />
         <QuickActions />
         <ActiveInvestments investments={investments} />
-
-        {/* O BOTÃO DE SAIR ANTIGO FOI REMOVIDO DAQUI */}
-
       </div>
       <BottomNav />
     </div>

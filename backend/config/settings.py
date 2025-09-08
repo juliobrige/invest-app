@@ -130,12 +130,15 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 
+# --- Configurações do Django REST Framework ---
 REST_FRAMEWORK = {
- 
+    # Define a classe de autenticação padrão para a nossa API.
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    # Define a permissão padrão. Só utilizadores autenticados podem aceder.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ]
+    # As linhas para 'DEFAULT_RENDERER_CLASSES' e 'DEFAULT_PARSER_CLASSES' foram removidas.
 }

@@ -11,7 +11,7 @@ const ActionButton = ({ to, label, Icon }) => (
   </Link>
 );
 
-// Ícones SVG Placeholder (uma boa prática é tê-los noutro ficheiro)
+// Ícones SVG Placeholder
 const DepositIcon = () => <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M12 2v20m8-8-8 8-8-8"></path></svg>;
 const WithdrawIcon = () => <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M12 18V2m-8 8 8-8 8 8"></path></svg>;
 const InvestIcon = () => <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><line x1="12" y1="1" x2="12" y2="23"></line><path d="m17 5 5 5-5 5"></path><path d="m7 19-5-5 5-5"></path></svg>;
@@ -22,8 +22,10 @@ const QuickActions = () => (
     <ActionButton to="/deposit" label="Depositar" Icon={DepositIcon} />
     <ActionButton to="/withdraw" label="Retirar" Icon={WithdrawIcon} />
     <ActionButton to="/invest" label="Investir" Icon={InvestIcon} />
+    {/* ATUALIZADO: Este 'to' agora aponta para a nova página de convites */}
     <ActionButton to="/invite" label="Convidar" Icon={InviteIcon} />
   </div>
 );
 
 export default QuickActions;
+

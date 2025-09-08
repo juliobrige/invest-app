@@ -4,6 +4,7 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 import os
+from django.contrib.auth.hashers import make_password, check_password # Ferramentas para encriptar
 
 class VIPLevel(models.Model):
     level_number = models.PositiveSmallIntegerField(primary_key=True, verbose_name="Número do Nível")
@@ -53,7 +54,21 @@ class Profile(models.Model):
     referral_code = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     referred_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='referrals')
     vip_level = models.ForeignKey(VIPLevel, on_delete=models.SET_NULL, null=True, blank=True, default=1)
-    def __str__(self): return self.user.name
+    payment_code = models.CharField(max_length=128, blank=True, null=True, verbose_name="Código de Pagamento (Encriptado)")
+    def set_payment_code(self, raw_code):
+        """Encripta e guarda o código de pagamento de forma segura."""
+        self.payment_code = make_password(raw_code)
+        self.save()
+
+    # MÉTODO CORRIGIDO/ADICIONADO:
+    def check_payment_code(self, raw_code):
+        """Verifica se um código fornecido corresponde ao código guardado."""
+        if not self.payment_code:
+            return False
+        return check_password(raw_code, self.payment_code)
+
+    def __str__(self):
+        return self.user.name
 
 class Wallet(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -134,9 +149,12 @@ class Transaction(models.Model):
     reference_id = models.CharField(max_length=100, blank=True, null=True)
     proof_of_payment = models.ImageField(upload_to='proof_payments/', blank=True, null=True)
     destination_bank = models.ForeignKey('BankAccount', on_delete=models.SET_NULL, null=True, blank=True)
+    withdrawal_account_name = models.CharField(max_length=150, blank=True, null=True, verbose_name="Nome do Titular (Saque)")
+    withdrawal_account_number = models.CharField(max_length=50, blank=True, null=True, verbose_name="Nº da Conta (Saque)")
 
     class Meta:
         ordering = ['-timestamp']
+    
     def __str__(self):
         return f"{self.get_transaction_type_display()} de {self.amount} por {self.user.name} - {self.status}"
 

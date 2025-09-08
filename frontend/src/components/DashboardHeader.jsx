@@ -1,20 +1,27 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { Link } from 'react-router-dom'; // Importar o Link para a navegação
 
 const DashboardHeader = () => {
-  const { user, profile, logout } = useAuth(); // Obtemos a função logout do contexto
+  const { user, profile, logout } = useAuth(); // Obtemos os dados e a função logout do nosso contexto
 
   return (
     <header className="flex items-center justify-between p-4 mb-4">
-      <div className="flex items-center space-x-3">
-        <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+      {/* A ÁREA DO UTILIZADOR AGORA É UM LINK CLICÁVEL QUE LEVA PARA A PÁGINA DE CONTA */}
+      <Link 
+        to="/account" 
+        className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+      >
+        <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
           <span className="text-xl font-bold text-gray-600">{user?.name?.charAt(0) || 'U'}</span>
         </div>
         <div>
           <p className="font-bold text-gray-800">Olá, {user?.name || ''}!</p>
           <p className="text-xs text-gray-500">Nível VIP: {profile?.vip_level?.name || 'Bronze'}</p>
         </div>
-      </div>
+      </Link>
+      
+      {/* O botão de logout permanece no seu novo sítio */}
       <button
         onClick={logout}
         title="Sair"
