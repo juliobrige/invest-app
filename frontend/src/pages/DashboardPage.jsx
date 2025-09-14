@@ -1,19 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import apiClient from '../api/apiClient';
+import React, { useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-// Importar os nossos componentes premium
+// Importar os nossos componentes premium e agora dinâmicos
 import DashboardHeader from '../components/DashboardHeader';
 import BalanceCard from '../components/BalanceCard';
 import QuickActions from '../components/QuickActions';
 import ActiveInvestments from '../components/ActiveInvestments';
+import RecentTransactions from '../components/RecentTransactions'; // O nosso novo componente dinâmico
 import BottomNav from '../components/BottomNav';
 
 const DashboardPage = () => {
   // Obtemos os dados e a função para os atualizar do nosso contexto
   const { wallet, fetchInitialData } = useAuth();
-  const [investments, setInvestments] = useState([]);
   
   // Lógica para mostrar a mensagem de sucesso (vinda de outras páginas)
   const location = useLocation();
@@ -27,19 +26,9 @@ const DashboardPage = () => {
       }
   }, [successMessage, navigate, location.pathname]);
 
-  // Efeito para ir buscar os dados dos investimentos
+  // Efeito para ir buscar os dados principais quando a página carrega
   useEffect(() => {
-    const fetchInvestments = () => {
-        apiClient.get('/investments/').then(res => {
-            setInvestments(res.data);
-        }).catch(err => {
-            console.error("Não foi possível carregar os investimentos.", err);
-        });
-    };
-    
-    // Vamos buscar os dados quando a página carrega
     fetchInitialData();
-    fetchInvestments();
   }, [fetchInitialData]);
 
   return (
@@ -56,7 +45,11 @@ const DashboardPage = () => {
 
         <BalanceCard wallet={wallet} />
         <QuickActions />
-        <ActiveInvestments investments={investments} />
+
+        {/* Usamos os novos componentes dinâmicos aqui, que irão buscar os seus próprios dados */}
+        <ActiveInvestments />
+        <RecentTransactions />
+        
       </div>
       <BottomNav />
     </div>

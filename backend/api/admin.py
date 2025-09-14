@@ -7,11 +7,6 @@ from django.contrib.auth.models import User
 
 from .models import Profile, Wallet, MachinePlan, Investment, Transaction, VIPLevel, BankAccount
 
-# --- Gestão de Utilizadores Melhorada (com Perfil e Carteira integrados) ---
-
-# A linha `admin.site.unregister(User)` foi removida.
-# O decorador `@admin.register(User)` abaixo já lida com a substituição do admin padrão.
-
 class ProfileInline(admin.StackedInline):
     """Permite editar o Perfil diretamente na página do Utilizador."""
     model = Profile

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.conf import settings
 from users.models import CustomUser
+from django.db.models import Sum
 from django.utils import timezone 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth.password_validation import validate_password
@@ -85,12 +86,19 @@ class WithdrawalCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError("O código de pagamento está incorreto.")
         return value
 
-# ... (O resto dos seus serializers continua aqui)
-
 class WalletSerializer(serializers.ModelSerializer):
+    total_deposited = serializers.ReadOnlyField()
+    total_withdrawn = serializers.ReadOnlyField()
+
     class Meta:
         model = Wallet
-        fields = ('available_balance', 'invested_balance', 'total_earnings')
+        fields = (
+            'available_balance', 
+            'invested_balance', 
+            'total_earnings',
+            'total_deposited',
+            'total_withdrawn'
+        )
 
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
